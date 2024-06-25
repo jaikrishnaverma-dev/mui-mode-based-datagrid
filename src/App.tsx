@@ -70,7 +70,11 @@ function App() {
         columns={columns}
         onRowClick={(data: any) => console.log("row clicked", data)} //on row click
         isRowSelectable={(params: GridRowParams) => {
-          return true;
+          let id:string|number = params.id;
+          if (typeof id ==="string") {
+            id = parseInt(id);
+          }
+          return id % 2 !== 0;
         }} //callbak for row selectable or not callback
         onCellClick={(data) => {
           console.log({ data });
