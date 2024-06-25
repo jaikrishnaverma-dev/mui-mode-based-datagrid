@@ -22,6 +22,9 @@
   padding: 4px 8px !important;
   width: calc(100% - 32px);
 }
+.css-1em98p-MuiDataGrid-root .MuiDataGrid-columnHeader:focus, .css-1em98p-MuiDataGrid-root .MuiDataGrid-cell:focus{
+    outline: none !important;
+}
 
 @media print {
     .MuiDataGrid-main.css-3eek4p-MuiDataGrid-main,
@@ -37,10 +40,10 @@
       height: auto !important;
       --height: auto !important;
     }
-    .css-n3fyjk-MuiDataGrid-root .MuiDataGrid-cell {
+    .css-n3fyjk-MuiDataGrid-root .MuiDataGrid-cell,.css-1em98p-MuiDataGrid-root .MuiDataGrid-cell {
       text-overflow: unset !important;
       overflow: visible !important;
-      white-space: wrap;
+      white-space: wrap !important;
     }
     .MuiDataGrid-scrollbar {
       display: none !important;

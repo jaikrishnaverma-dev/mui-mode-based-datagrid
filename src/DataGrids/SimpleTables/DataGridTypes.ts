@@ -1,12 +1,15 @@
-import { GridColDef } from "@mui/x-data-grid";
+import { GridColDef, GridRowClassNameParams, GridRowParams } from "@mui/x-data-grid";
 
 export interface WrapperDataGridProps {
     mode?: "server" | "client";
     apiEndpoint: string;
     columns: GridColDef[];
     docTitle: string;
+    onRowClick?:(rowData:{columns:any[],id:string|number,row:any})=>void;
+    isRowSelectable?:(params: GridRowParams) => boolean;
+    getRowClassName:(params: GridRowClassNameParams) => string
   }
-  
+
 export  interface DataRow {
     id: number;
     title: string;

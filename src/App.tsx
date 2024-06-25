@@ -1,7 +1,11 @@
 import React from "react";
 import "./App.css";
 import SimpleTable from "./DataGrids/SimpleTables/SimpleTable";
-import { GridColDef } from "@mui/x-data-grid";
+import {
+  GridColDef,
+  GridRowClassNameParams,
+  GridRowParams,
+} from "@mui/x-data-grid";
 const columns: GridColDef[] = [
   {
     field: "#",
@@ -60,10 +64,20 @@ function App() {
   return (
     <div className="App">
       <SimpleTable
-        mode="client"
+        mode="server"
         apiEndpoint="https://dummyjson.com/products"
         docTitle="Report for DR. D.K. VATSAL from 08/06/2024 to 14/06/2024"
         columns={columns}
+        onRowClick={(data: any) => console.log("row clicked", data)}
+        isRowSelectable={(params: GridRowParams) => {
+          return params.row.id % 2 === 0;
+        }}
+        getRowClassName={(params: GridRowClassNameParams) => {
+          if (params.row.id === 2) {
+            return "custom_row"
+          }
+          return "";
+        }}
       />
     </div>
   );

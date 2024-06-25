@@ -7,3 +7,7 @@
   flex-direction: column;
   gap: 50;
 }
+.custom_row{
+  background-color: #cbe0bb !important;
+  /* color: white; */
+}
