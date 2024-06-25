@@ -72,6 +72,13 @@ const SimpleTable: React.FC<WrapperDataGridProps> = ({
         };
         if (!all)
           params = { ...params, skip: page * pageSize, limit: pageSize };
+        if (mode === "server" && rowSelectionModel.length)
+          params = {
+            ...params,
+            selected_ids: isSelectAll ? "all" : rowSelectionModel,
+          };
+        if (mode === "server" && sortModel.length)
+          params = { ...params, sort: sortModel };
         const response = await axios.get<any>(apiEndpoint, {
           params,
         });
@@ -79,16 +86,22 @@ const SimpleTable: React.FC<WrapperDataGridProps> = ({
           const arrData = response.data.products;
           setData(arrData);
           setRowCount(response.data.total);
-          if (mode === "server" && isSelectAll) {
+          if (mode === "server" && (isSelectAll || props?.defaultSelection)) {
             setRowSelectionModel((prev: GridRowId[]) => {
               const remainingId: string[] | number[] = arrData
                 .filter((row: any) => {
                   const availableIndex = prev.find((id: any) => row?.id == id);
                   if (props?.isRowSelectable) {
-                    return (
-                      availableIndex === undefined &&
-                      props?.isRowSelectable({ row, id: row.id, columns: [] })
-                    );
+                    if (isSelectAll)
+                      return (
+                        availableIndex === undefined &&
+                        props?.isRowSelectable({ row, id: row.id, columns: [] })
+                      );
+                    else if (props?.defaultSelection)
+                      return (
+                        availableIndex === undefined &&
+                        props.defaultSelection({ row, id: row.id, columns: [] })
+                      );
                   }
                   return availableIndex === undefined;
                 })
@@ -103,7 +116,14 @@ const SimpleTable: React.FC<WrapperDataGridProps> = ({
         setLoading(false);
       }
     },
-    [searchQuery, filterModel, sortModel, paginationModel, isSelectAll]
+    [
+      searchQuery,
+      filterModel,
+      sortModel,
+      paginationModel,
+      isSelectAll,
+      rowSelectionModel,
+    ]
   );
 
   console.log({ rowCount });
@@ -207,12 +227,14 @@ const SimpleTable: React.FC<WrapperDataGridProps> = ({
     },
     [data, filterModel]
   );
-  /*** */
+
   const handleSearch = (event: any) => {
     const query = event.target.value;
     setSearchQuery(query);
   };
   const rowSelectionHandler = (selectedRows: any) => {
+    console.log({ selectedRows });
+
     let requiredSize = paginationModel.pageSize;
     if (props?.isRowSelectable) {
       requiredSize = data.filter(
@@ -221,12 +243,20 @@ const SimpleTable: React.FC<WrapperDataGridProps> = ({
           props?.isRowSelectable({ row, id: row.id, columns: [] })
       ).length;
     }
-    const isAllSelection =
-      data.filter((data) =>
-        selectedRows.find((id: string | number) => id == data?.id)
-      ).length === requiredSize;
-    setIsSelectAll(isAllSelection);
-    setRowSelectionModel(selectedRows);
+    if (
+      isSelectAll &&
+      selectedRows.length === rowSelectionModel.length - requiredSize
+    ) {
+      setIsSelectAll(false);
+      setRowSelectionModel([]);
+    } else {
+      const isAllSelection =
+        data.filter((data) =>
+          selectedRows.find((id: string | number) => id === data?.id)
+        ).length === requiredSize;
+      setIsSelectAll(isAllSelection);
+      setRowSelectionModel(selectedRows);
+    }
   };
   /**
    * column search input handler logic
@@ -330,6 +360,7 @@ const SimpleTable: React.FC<WrapperDataGridProps> = ({
         },
       };
       if (props?.onRowClick) obj.onRowClick = props.onRowClick;
+      if (props?.onCellClick) obj.onCellClick = props.onCellClick;
       if (props?.isRowSelectable) obj.isRowSelectable = props.isRowSelectable;
       if (props?.getRowClassName) obj.getRowClassName = props.getRowClassName;
       if (mode === "server") {
@@ -393,8 +424,7 @@ const SimpleTable: React.FC<WrapperDataGridProps> = ({
       <style>
         {`
     @media print{
-        .MuiDataGrid-cell,
-    .MuiDataGrid-columnHeader {
+        .MuiDataGrid-cell,.MuiDataGrid-columnHeader {
       width: calc(
         85% / ${
           columns.length -

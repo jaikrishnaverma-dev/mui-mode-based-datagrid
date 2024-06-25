@@ -6,8 +6,10 @@ export interface WrapperDataGridProps {
     columns: GridColDef[];
     docTitle: string;
     onRowClick?:(rowData:{columns:any[],id:string|number,row:any})=>void;
+    onCellClick?:(rowData:any)=>void;
     isRowSelectable?:(params: GridRowParams) => boolean;
-    getRowClassName:(params: GridRowClassNameParams) => string
+    getRowClassName?:(params: GridRowClassNameParams) => string
+    defaultSelection?:(params: GridRowParams) => boolean
   }
 
 export  interface DataRow {
