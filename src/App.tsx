@@ -66,17 +66,27 @@ function App() {
       <SimpleTable
         mode="server"
         apiEndpoint="https://dummyjson.com/products"
-        docTitle="Report for DR. D.K. VATSAL from 08/06/2024 to 14/06/2024"
+        docTitle="Report for DR. D.K. VATSAL from 08/06/2024 to 14/06/2024" //for excel title
         columns={columns}
-        onRowClick={(data: any) => console.log("row clicked", data)}
+        onRowClick={(data: any) => console.log("row clicked", data)} //on row click
         isRowSelectable={(params: GridRowParams) => {
-          return params.row.id % 2 === 0;
+          return true;
+        }} //callbak for row selectable or not callback
+        onCellClick={(data) => {
+          console.log({ data });
         }}
         getRowClassName={(params: GridRowClassNameParams) => {
           if (params.row.id === 2) {
-            return "custom_row"
+            return "custom_row";
           }
           return "";
+        }} //with this callback we return classname for row by conditons
+        defaultSelection={(params: GridRowParams) => {
+          let id:string|number = params.id;
+          if (typeof id ==="string") {
+            id = parseInt(id);
+          }
+          return id % 2 === 0;
         }}
       />
     </div>
